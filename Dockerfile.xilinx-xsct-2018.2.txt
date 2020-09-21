@@ -1,0 +1,30 @@
+# docker build -f Dockerfile.xilinx-xsct-2018.2.txt . -t mabe/xilinx-xsct
+
+FROM ubuntu:16.04
+
+ARG XLNX_INSTALL_LOCATION=/opt/Xilinx
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Set bash as default shell
+RUN echo "dash dash/sh boolean false" | debconf-set-selections 
+RUN DEBIAN_FRONTEND=$DEBIAN_FRONTEND dpkg-reconfigure dash
+
+RUN mkdir -p /tmp/2018.2	
+
+COPY 2018.2 /tmp/2018.2
+
+RUN ls /tmp
+		
+RUN cd /tmp/2018.2 \
+  	&& chmod a+x xsetup \
+	&& ./xsetup \
+	--agree XilinxEULA,3rdPartyEULA,WebTalkTerms \
+	--config install_config.txt \
+	--batch INSTALL
+	
+RUN useradd -ms /bin/bash user
+	
+RUN echo "source /opt/Xilinx/SDK/2018.2/settings64.sh" > /home/user/.bashrc	
+
+
